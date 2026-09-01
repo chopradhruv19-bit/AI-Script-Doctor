@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "AI Script Doctor"
+description = "A screenplay analysis workspace that sends pasted scripts through four Gemini-powered review agents and presents a compiled report with structure, character, dialogue, and scene notes."
+version = "1.0.0"
+id = "artifacts/ai-script-doctor"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18761
+
+[services.development]
+run = "pnpm --filter @workspace/ai-script-doctor run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ai-script-doctor", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/ai-script-doctor/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18761"
+BASE_PATH = "/"
