@@ -1,45 +1,51 @@
-# [Project name]
+# AI Script Doctor
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+AI Script Doctor reads a pasted screenplay through four Gemini-powered editorial passes and returns a focused report for the next draft.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `python artifacts/ai-script-doctor/app.py` — run the Flask app and analysis API
+- `pnpm --filter @workspace/ai-script-doctor run build` — build the React interface into `dist/public`
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required secret: `GEMINI_API_KEY`
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- UI: React + Vite
+- API: Flask + Google GenAI Python SDK
+- Model: `gemini-2.5-flash`, with a narrow provider-retirement fallback to the current Gemini Flash model
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/ai-script-doctor/app.py` — Flask server, `/api/analyze`, and four Gemini agent functions
+- `artifacts/ai-script-doctor/src/pages/home.tsx` — single-page screenplay input and compiled report renderer
+- `artifacts/ai-script-doctor/src/index.css` — manuscript workspace theme and responsive layout
+- `artifacts/ai-script-doctor/requirements.txt` — Python runtime dependencies
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The first three specialist passes run concurrently, then the compiler pass merges their JSON.
+- The API returns both the compiled `report` and raw `agents` results so the UI can expose specialist-level detail without another request.
+- The app intentionally keeps drafts in the current browser session; no screenplay persistence or database is used.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Paste or load a sample screenplay.
+- Request notes through structure, character, dialogue, and compiler passes.
+- Read top revision priorities, act movement, character flags, dialogue naturalness, and scene notes.
+- Copy the raw compiled report or start a new review.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+The interface should remain serif-led with a monospace screenplay input, and the primary action should stay obvious.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The preview workflow runs Flask from the artifact directory, so the frontend must be rebuilt after UI changes before restarting the preview.
+- The shared proxy routes `/api/analyze` to this artifact; the existing API Server health route remains separate.
 
 ## Pointers
 
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.

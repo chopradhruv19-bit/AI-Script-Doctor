@@ -8,11 +8,11 @@ router = "path"
 
 [[services]]
 name = "web"
-paths = [ "/" ]
+paths = [ "/", "/api" ]
 localPort = 18761
 
 [services.development]
-run = "pnpm --filter @workspace/ai-script-doctor run dev"
+run = "python app.py"
 
 [services.production]
 build = [ "pnpm", "--filter", "@workspace/ai-script-doctor", "run", "build" ]

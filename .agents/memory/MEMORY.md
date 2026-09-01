@@ -1,0 +1,1 @@
+- [Gemini model availability](gemini-model-availability.md) — requested model names may need a narrow fallback when provider access differs for new keys.
