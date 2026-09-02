@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parent
 DIST_DIR = ROOT / "dist" / "public"
 MODEL = "gemini-2.5-flash"
 FALLBACK_MODEL = "gemini-3.6-flash"
+REQUEST_TIMEOUT_MS = 120_000
 
 app = Flask(__name__, static_folder=str(DIST_DIR), static_url_path="")
 
@@ -21,7 +22,10 @@ def get_client() -> genai.Client:
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is not configured.")
-    return genai.Client(api_key=api_key)
+    return genai.Client(
+        api_key=api_key,
+        http_options=types.HttpOptions(timeout=REQUEST_TIMEOUT_MS),
+    )
 
 
 def clean_json(text: str) -> dict[str, Any]:

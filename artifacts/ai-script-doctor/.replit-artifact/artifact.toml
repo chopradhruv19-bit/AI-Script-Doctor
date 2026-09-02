@@ -16,12 +16,7 @@ run = "python app.py"
 
 [services.production]
 build = [ "pnpm", "--filter", "@workspace/ai-script-doctor", "run", "build" ]
-serve = "static"
-publicDir = "artifacts/ai-script-doctor/dist/public"
-
-[[services.production.rewrites]]
-from = "/*"
-to = "/index.html"
+run = "gunicorn --chdir artifacts/ai-script-doctor app:app --bind 0.0.0.0:$PORT"
 
 [services.env]
 PORT = "18761"

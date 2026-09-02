@@ -356,8 +356,23 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ script }),
       });
-      if (!response.ok) throw new Error(`The review service returned ${response.status}.`);
-      const data = await response.json() as { report?: ReportData; agents?: Record<string, unknown> } & ReportData;
+      const rawBody = await response.text();
+      let data: { report?: ReportData; agents?: Record<string, unknown>; error?: string } & ReportData;
+      try {
+        data = JSON.parse(rawBody) as typeof data;
+      } catch {
+        throw new Error(
+          response.ok
+            ? 'The review service returned an invalid response. Please try again.'
+            : `The review service returned ${response.status}. Please try again.`,
+        );
+      }
+      if (!response.ok) {
+        throw new Error(data.error || `The review service returned ${response.status}.`);
+      }
+      if (!data.report && !data.executive_summary) {
+        throw new Error('The review service returned incomplete notes. Please try again.');
+      }
       setReport(data.report ?? data);
       setAgents(data.agents ?? {});
       setState('success');
